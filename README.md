@@ -100,5 +100,10 @@ Two game states are equivalent if their player states, dealer states and shoe st
 
 ### Decision trees
 
+Decision trees are a way to model the sample space of a probability calculation using a *tree graph* structure. Each node in the tree represents a possible states of the sample space (for example, heads or tails in a coin flip, rain, snow or sunny weather for forecasting, etc.) and the weight of an edge between two nodes is the probability or likelihood of the state changing from the starting state to the end state.
+
+If the events or states are statistically independent from one another, it is possible to calculate the probability of a certain final state (i.e. a state that has no subsequent next states) by traversing the path from an initial state all the way to that final state and multiply all the edge weights together.
+
 ### Expected value
 
+In blackjack, the aim is to maximize your wins or to minimize your losses. Given all the possible outcomes and all the decisions a player can take, there are *many* possible end states. But using the decision tree representation, it is possible to calculate the average expected win (or loss) based on the probabilities calculated from each state to its next.
