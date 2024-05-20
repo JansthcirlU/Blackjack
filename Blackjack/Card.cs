@@ -2,23 +2,16 @@ namespace Blackjack;
 
 public readonly record struct Card(Rank Rank, Suit Suit, int Deck) : IEquivalent<Card>
 {
-    public bool IsEquivalent(Card other)
-        => Rank == other.Rank
-        ||  (
-                (
-                    Rank == Rank.Ten
-                    || Rank == Rank.Jack
-                    || Rank == Rank.Queen
-                    || Rank == Rank.King
-                ) 
-                && 
-                (
-                    other.Rank == Rank.Ten
-                    || other.Rank == Rank.Jack
-                    || other.Rank == Rank.Queen
-                    || other.Rank == Rank.King
-                )
-            );
+    public bool IsEquivalentTo(Card other)
+        => GetRankValue() == other.GetRankValue();
+
+    public int GetRankValue()
+        => Rank switch
+        {
+            Rank.Ace => 1,
+            Rank.Ten or Rank.Jack or Rank.Queen or Rank.King => 10,
+            Rank r => (int)r,
+        };
 
     public override string ToString()
     {
