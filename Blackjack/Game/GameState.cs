@@ -3,7 +3,7 @@ using Blackjack.Players;
 
 namespace Blackjack.Game;
 
-public class GameState
+public class GameState : IEquivalent<GameState>
 {
     public Player Player { get; }
     public Dealer Dealer { get; }
@@ -53,4 +53,9 @@ public class GameState
         }
         yield break;
     }
+
+    public bool IsEquivalentTo(GameState other)
+        => Shoe.IsEquivalentTo(other.Shoe)
+        && Dealer.IsEquivalentTo(other.Dealer)
+        && Player.IsEquivalentTo(other.Player);
 }

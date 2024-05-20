@@ -2,5 +2,5 @@
 
 public interface IEquivalent<T>
 {
-    bool IsEquivalent(T other);
+    bool IsEquivalentTo(T other);
 }

@@ -1,4 +1,5 @@
-﻿using Blackjack.Game;
+﻿using System.Numerics;
+using Blackjack.Game;
 using Graphs.Unweighted;
 
 namespace Calculators.Graphs;
@@ -21,6 +22,13 @@ public class BlackjackGraph : IUnweightedGraph<BlackjackNode, BlackjackEdge, Gam
     public BlackjackNode AddNode(GameState value)
     {
         BlackjackNode node = new(value);
+        _nodes.AddLast(node);
+        return node;
+    }
+
+    public BlackjackNode AddNodeWithCount(GameState value, BigInteger count)
+    {
+        BlackjackNode node = new(value, count);
         _nodes.AddLast(node);
         return node;
     }

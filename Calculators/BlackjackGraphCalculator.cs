@@ -1,3 +1,4 @@
+using System.Numerics;
 using Blackjack;
 using Blackjack.Game;
 using Calculators.Graphs;
@@ -33,7 +34,23 @@ public class BlackjackGraphCalculator
         IEnumerable<GameState> initialStates = GameState.GetInitialStates(rules);
         foreach (GameState state in initialStates)
         {
-            graph.AddNode(state);
+            BigInteger count = BigInteger.Zero;
+            foreach (GameState other in initialStates)
+            {
+                if (state.Id != other.Id && state.IsEquivalentTo(other))
+                {
+                    count++;
+                }
+            }
+
+            if (count > 0)
+            {
+                graph.AddNodeWithCount(state, (int)count);
+            }
+            else
+            {
+                graph.AddNode(state);
+            }
         }
         return graph;
     }
