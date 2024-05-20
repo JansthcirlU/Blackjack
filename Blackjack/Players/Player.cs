@@ -1,6 +1,6 @@
 namespace Blackjack.Players;
 
-public class Player
+public class Player : IEquivalent<Player>
 {
     private readonly List<PlayerHand> _hands = [];
 
@@ -79,6 +79,54 @@ public class Player
                 }
             }
         }
+    }
+
+    public bool IsEquivalentTo(Player other)
+    {
+        Dictionary<PlayerHand, int> equivalenceCounts = GetEquivalenceCounts(_hands);
+        Dictionary<PlayerHand, int> otherEquivalenceCounts = GetEquivalenceCounts(other._hands);
+        
+        try
+        {
+            foreach ((PlayerHand key, int value) in equivalenceCounts)
+            {
+                PlayerHand? otherKey = otherEquivalenceCounts.Keys.SingleOrDefault(k => k.IsEquivalentTo(key));
+                if (otherKey is null) return false;
+                if (otherEquivalenceCounts[otherKey] != value) return false;
+            }
+            return true;   
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static Dictionary<PlayerHand, int> GetEquivalenceCounts(List<PlayerHand> list)
+    {
+        Dictionary<PlayerHand, int> counts = [];
+
+        foreach (var item in list)
+        {
+            bool found = false;
+
+            foreach (var key in counts.Keys.ToList())
+            {
+                if (item.IsEquivalentTo(key))
+                {
+                    counts[key]++;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                counts[item] = 1;
+            }
+        }
+
+        return counts;
     }
 
     public override string ToString()

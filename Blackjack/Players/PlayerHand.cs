@@ -2,7 +2,7 @@ using Blackjack.Scoring;
 
 namespace Blackjack.Players;
 
-public class PlayerHand
+public class PlayerHand : IEquivalent<PlayerHand>
 {
     private readonly List<Card> _cards = [];
 
@@ -24,7 +24,7 @@ public class PlayerHand
     {
         PlayerHandState state = PlayerHandState.InPlay;
         PlayerDecision allowedDecisions = PlayerDecision.Stand | PlayerDecision.Hit | PlayerDecision.DoubleDown | PlayerDecision.Surrender;
-        if (first.IsEquivalent(second)) allowedDecisions |= PlayerDecision.Split;
+        if (first.IsEquivalentTo(second)) allowedDecisions |= PlayerDecision.Split;
 
         PlayerHand hand = new(bet, [first, second], state, allowedDecisions);
         return hand;
@@ -64,4 +64,14 @@ public class PlayerHand
 
     public override string ToString()
         => string.Join(string.Empty, _cards.Select(c => c.ToString()));
+
+    public bool IsEquivalentTo(PlayerHand other)
+    {
+        if (other is null) return false;
+        if (!_cards.IsEquivalentTo(other._cards)) return false;
+
+        return Bet == other.Bet
+            && State == other.State
+            && AllowedDecisions == other.AllowedDecisions;
+    }
 }

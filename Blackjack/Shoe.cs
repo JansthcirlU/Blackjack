@@ -1,6 +1,6 @@
 namespace Blackjack;
 
-public class Shoe
+public class Shoe : IEquivalent<Shoe>
 {
     private List<Card> _cards = [];
 
@@ -47,6 +47,19 @@ public class Shoe
                 }
             }
         }
+    }
+
+    public bool IsEquivalentTo(Shoe other)
+    {
+        if (other is null) return false;
+        if (_cards.Count != other._cards.Count) return false;
+
+        for (int i = 0; i < _cards.Count; i++)
+        {
+            if (!_cards[i].IsEquivalentTo(other._cards[i])) return false;
+        }
+
+        return true;
     }
 
     public override string ToString()

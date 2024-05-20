@@ -2,7 +2,7 @@
 
 namespace Blackjack.Dealers;
 
-public class Dealer
+public class Dealer : IEquivalent<Dealer>
 {
     private readonly List<Card> _hand = [];
     public bool HitsSoft { get; }
@@ -55,4 +55,14 @@ public class Dealer
 
     public override string ToString()
         => $"D({string.Join(string.Empty, _hand.Select(c => c.ToString()))})";
+
+    public bool IsEquivalentTo(Dealer other)
+    {
+        if (other is null) return false;
+        if (!_hand.IsEquivalentTo(other._hand)) return false;
+
+        return HitsSoft == other.HitsSoft
+            && State == other.State
+            && AllowedDecisions == other.AllowedDecisions;
+    }
 }
