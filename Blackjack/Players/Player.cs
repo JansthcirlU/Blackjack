@@ -102,19 +102,19 @@ public class Player : IEquivalent<Player>
         }
     }
 
-    private static Dictionary<PlayerHand, int> GetEquivalenceCounts(List<PlayerHand> list)
+    private static Dictionary<PlayerHand, int> GetEquivalenceCounts(List<PlayerHand> hands)
     {
-        Dictionary<PlayerHand, int> counts = [];
+        Dictionary<PlayerHand, int> equivalentHandsDictionary = [];
 
-        foreach (var item in list)
+        foreach (PlayerHand hand in hands)
         {
             bool found = false;
 
-            foreach (var key in counts.Keys.ToList())
+            foreach (PlayerHand key in equivalentHandsDictionary.Keys.ToList())
             {
-                if (item.IsEquivalentTo(key))
+                if (hand.IsEquivalentTo(key))
                 {
-                    counts[key]++;
+                    equivalentHandsDictionary[key]++;
                     found = true;
                     break;
                 }
@@ -122,11 +122,11 @@ public class Player : IEquivalent<Player>
 
             if (!found)
             {
-                counts[item] = 1;
+                equivalentHandsDictionary[hand] = 1;
             }
         }
 
-        return counts;
+        return equivalentHandsDictionary;
     }
 
     public override string ToString()

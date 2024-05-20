@@ -6,11 +6,11 @@ public static class BlackjackExtensions
     {
         if (cards.Count() != other.Count()) return false;
 
-        var thisHandRanks = cards
+        Dictionary<int, int> thisHandRanks = cards
             .Select(c => c.GetRankValue())
             .GroupBy(rank => rank)
             .ToDictionary(g => g.Key, g => g.Count());
-        var otherHandRanks = other
+        Dictionary<int, int> otherHandRanks = other
             .Select(c => c.GetRankValue())
             .GroupBy(rank => rank)
             .ToDictionary(g => g.Key, g => g.Count());
