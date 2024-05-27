@@ -1,8 +1,10 @@
+using System.Collections.Immutable;
+
 namespace Blackjack.Players;
 
 public class Player : IEquivalent<Player>
 {
-    private readonly List<PlayerHand> _hands = [];
+    private readonly ImmutableArray<PlayerHand> _hands;
 
     public Guid Id { get; }
     public bool CanPlay => _hands.Any(h => h.State == PlayerHandState.InPlay);
@@ -10,7 +12,7 @@ public class Player : IEquivalent<Player>
     private Player(IEnumerable<PlayerHand> hands)
     {
         Id = Guid.NewGuid();
-        _hands.AddRange(hands);
+        _hands = [.. hands];
     }
 
     public static Player StartWith(Card first, Card second, decimal bet)
@@ -23,7 +25,7 @@ public class Player : IEquivalent<Player>
     {
         if (_hands.All(h => h.State != PlayerHandState.InPlay)) yield break;
 
-        for (int i = 0; i < _hands.Count; i++)
+        for (int i = 0; i < _hands.Length; i++)
         {
             PlayerHand hand = _hands[i];
             if (hand.State != PlayerHandState.InPlay) continue;
@@ -31,7 +33,7 @@ public class Player : IEquivalent<Player>
             if ((hand.AllowedDecisions & PlayerDecision.Stand) == PlayerDecision.Stand)
             {
                 PlayerHand standHand = hand.Stand();
-                List<PlayerHand> handsAfterStand = [.. _hands[..i], standHand, .. _hands[(i + 1)..]];
+                ImmutableArray<PlayerHand> handsAfterStand = [.. _hands[..i], standHand, .. _hands[(i + 1)..]];
                 Player playerAfterStand = new(handsAfterStand);
                 Shoe remaining = Shoe.CreateFrom(shoe);
                 yield return (playerAfterStand, remaining);
@@ -40,7 +42,7 @@ public class Player : IEquivalent<Player>
             if ((hand.AllowedDecisions & PlayerDecision.Surrender) == PlayerDecision.Surrender)
             {
                 PlayerHand surrenderHand = hand.Surrender();
-                List<PlayerHand> handsAfterSurrender = [.. _hands[..i], surrenderHand, .. _hands[(i + 1)..]];
+                ImmutableArray<PlayerHand> handsAfterSurrender = [.. _hands[..i], surrenderHand, .. _hands[(i + 1)..]];
                 Player playerAfterSurrender = new(handsAfterSurrender);
                 Shoe remaining = Shoe.CreateFrom(shoe);
                 yield return (playerAfterSurrender, remaining);
@@ -51,7 +53,7 @@ public class Player : IEquivalent<Player>
                 foreach ((IEnumerable<Card> drawn, Shoe remaining) in shoe.GetPossibleDrawsAndRemainingShoe(1))
                 {
                     PlayerHand hitHand = hand.Hit(drawn.First());
-                    List<PlayerHand> handsAfterHit = [.. _hands[..i], hitHand, .. _hands[(i + 1)..]];
+                    ImmutableArray<PlayerHand> handsAfterHit = [.. _hands[..i], hitHand, .. _hands[(i + 1)..]];
                     Player playerAfterHit = new(handsAfterHit);
                     yield return (playerAfterHit, remaining);
                 }
@@ -62,7 +64,7 @@ public class Player : IEquivalent<Player>
                 foreach ((IEnumerable<Card> drawn, Shoe remaining) in shoe.GetPossibleDrawsAndRemainingShoe(1))
                 {
                     PlayerHand doubleDownHand = hand.DoubleDown(drawn.First());
-                    List<PlayerHand> handsAfterDoubleDown = [.. _hands[..i], doubleDownHand, .. _hands[(i + 1)..]];
+                    ImmutableArray<PlayerHand> handsAfterDoubleDown = [.. _hands[..i], doubleDownHand, .. _hands[(i + 1)..]];
                     Player playerAfterDoubleDown = new(handsAfterDoubleDown);
                     yield return (playerAfterDoubleDown, remaining);
                 }
@@ -73,7 +75,7 @@ public class Player : IEquivalent<Player>
                 foreach ((IEnumerable<Card> drawn, Shoe remaining) in shoe.GetPossibleDrawsAndRemainingShoe(2))
                 {
                     (PlayerHand first, PlayerHand second) = hand.Split(drawn.First(), drawn.Last());
-                    List<PlayerHand> handsAfterSplit = [.. _hands[..i], first, second, .. _hands[(i + 1)..]];
+                    ImmutableArray<PlayerHand> handsAfterSplit = [.. _hands[..i], first, second, .. _hands[(i + 1)..]];
                     Player playerAfterSplit = new(handsAfterSplit);
                     yield return (playerAfterSplit, remaining);
                 }
@@ -102,27 +104,21 @@ public class Player : IEquivalent<Player>
         }
     }
 
-    private static Dictionary<PlayerHand, int> GetEquivalenceCounts(List<PlayerHand> hands)
+    private static Dictionary<PlayerHand, int> GetEquivalenceCounts(ImmutableArray<PlayerHand> hands)
     {
         Dictionary<PlayerHand, int> equivalentHandsDictionary = [];
 
         foreach (PlayerHand hand in hands)
         {
-            bool found = false;
-
-            foreach (PlayerHand key in equivalentHandsDictionary.Keys.ToList())
-            {
-                if (hand.IsEquivalentTo(key))
-                {
-                    equivalentHandsDictionary[key]++;
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
+            PlayerHand? equivalentHand = equivalentHandsDictionary.Keys.SingleOrDefault(h => h.IsEquivalentTo(hand));
+            
+            if (equivalentHand is null)
             {
                 equivalentHandsDictionary[hand] = 1;
+            }
+            else
+            {
+                equivalentHandsDictionary[equivalentHand]++;
             }
         }
 

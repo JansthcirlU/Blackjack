@@ -1,10 +1,11 @@
+using System.Collections.Immutable;
 using Blackjack.Scoring;
 
 namespace Blackjack.Players;
 
 public class PlayerHand : IEquivalent<PlayerHand>
 {
-    private readonly List<Card> _cards = [];
+    private readonly ImmutableArray<Card> _cards;
 
     public Guid Id { get; }
     public decimal Bet { get; }
@@ -15,7 +16,7 @@ public class PlayerHand : IEquivalent<PlayerHand>
     {
         Id = Guid.NewGuid();
         Bet = bet;
-        _cards.AddRange(cards);
+        _cards = [..cards];
         State = state;
         AllowedDecisions = allowedDecisions;
     }
@@ -35,7 +36,7 @@ public class PlayerHand : IEquivalent<PlayerHand>
 
     public PlayerHand Hit(Card card)
     {
-        List<Card> cardsAfterHit = [.. _cards, card];
+        ImmutableArray<Card> cardsAfterHit = [.. _cards, card];
         PlayerDecision allowedDecisions = PlayerDecision.Stand | PlayerDecision.Hit | PlayerDecision.DoubleDown | PlayerDecision.Surrender;
         if (Scorer.IsBust(cardsAfterHit)) return new(Bet, cardsAfterHit, PlayerHandState.Bust, PlayerDecision.None);
         if (Scorer.IsBlackjack(cardsAfterHit)) return new(Bet, cardsAfterHit, PlayerHandState.Blackjack, PlayerDecision.None);
@@ -45,7 +46,7 @@ public class PlayerHand : IEquivalent<PlayerHand>
     public PlayerHand DoubleDown(Card card)
     {
         decimal betAfterDoubleDown = Bet * 2;
-        List<Card> cardsAfterDoubleDown = [.. _cards, card];
+        ImmutableArray<Card> cardsAfterDoubleDown = [.. _cards, card];
         PlayerDecision decisionsAfterDoubleDown = PlayerDecision.None;
         return Scorer.IsBust(cardsAfterDoubleDown)
             ? new(betAfterDoubleDown, cardsAfterDoubleDown, PlayerHandState.Bust, decisionsAfterDoubleDown)

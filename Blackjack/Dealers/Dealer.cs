@@ -1,10 +1,11 @@
-﻿using Blackjack.Scoring;
+﻿using System.Collections.Immutable;
+using Blackjack.Scoring;
 
 namespace Blackjack.Dealers;
 
 public class Dealer : IEquivalent<Dealer>
 {
-    private readonly List<Card> _hand = [];
+    private readonly ImmutableArray<Card> _hand;
     public bool HitsSoft { get; }
     public DealerState State { get; }
     public DealerDecision AllowedDecisions { get; }
@@ -12,7 +13,7 @@ public class Dealer : IEquivalent<Dealer>
 
     private Dealer(IEnumerable<Card> cards, bool hitsSoft, DealerState state, DealerDecision allowedDecisions)
     {
-        _hand.AddRange(cards);
+        _hand = [.. cards];
         HitsSoft = hitsSoft;
         State = state;
         AllowedDecisions = allowedDecisions;
@@ -20,7 +21,7 @@ public class Dealer : IEquivalent<Dealer>
 
     public static Dealer StartWith(Card first, Card second, bool hitsSoft)
     {
-        List<Card> cards = [first, second];
+        ImmutableArray<Card> cards = [first, second];
         if (Scorer.IsBlackjack(cards)) return new(cards, hitsSoft, DealerState.Blackjack, DealerDecision.None);
 
         BlackjackScore score = Scorer.GetScore(cards);
@@ -36,7 +37,7 @@ public class Dealer : IEquivalent<Dealer>
         {
             foreach ((IEnumerable<Card> drawn, Shoe remaining) in shoe.GetPossibleDrawsAndRemainingShoe(1))
             {
-                List<Card> handAfterHit = [.. _hand, drawn.First()];
+                ImmutableArray<Card> handAfterHit = [.. _hand, drawn.First()];
                 BlackjackScore score = Scorer.GetScore(handAfterHit);
                 (DealerState state, DealerDecision allowedDecisions) = GetDealerStateAndDecision(score, HitsSoft);
                 yield return (new(handAfterHit, HitsSoft, state, allowedDecisions), remaining);
