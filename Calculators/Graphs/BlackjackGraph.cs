@@ -26,12 +26,10 @@ public class BlackjackGraph : IUnweightedGraph<BlackjackNode, BlackjackEdge, Gam
         return node;
     }
 
-    public BlackjackNode AddNodeWithCount(GameState value, BigInteger count)
-    {
-        BlackjackNode node = new(value, count);
-        _nodes.AddLast(node);
-        return node;
-    }
+    public BlackjackNode? FindEquivalentNode(GameState value)
+        // Single enforces uniqueness, maybe too strict?
+        // Super inefficient, how can I speed this up?
+        => _nodes.SingleOrDefault(n => n.Value.IsEquivalentTo(value));
 
     public IEnumerable<BlackjackNode> GetUnvisitedNodes(int count)
     {

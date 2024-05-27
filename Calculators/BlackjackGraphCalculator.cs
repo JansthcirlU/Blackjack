@@ -34,22 +34,15 @@ public class BlackjackGraphCalculator
         IEnumerable<GameState> initialStates = GameState.GetInitialStates(rules);
         foreach (GameState state in initialStates)
         {
-            BigInteger count = BigInteger.Zero;
-            foreach (GameState other in initialStates)
+            BlackjackNode? node = graph.FindEquivalentNode(state);
+            
+            if (node is null)
             {
-                if (state.Id != other.Id && state.IsEquivalentTo(other))
-                {
-                    count++;
-                }
-            }
-
-            if (count > 0)
-            {
-                graph.AddNodeWithCount(state, (int)count);
+                graph.AddNode(state);
             }
             else
             {
-                graph.AddNode(state);
+                node.IncrementCount();
             }
         }
         return graph;
