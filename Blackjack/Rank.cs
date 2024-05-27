@@ -2,7 +2,8 @@
 
 public enum Rank
 {
-    Two = 2,
+    Ace,
+    Two,
     Three,
     Four,
     Five,
@@ -14,5 +15,4 @@ public enum Rank
     Jack,
     Queen,
     King,
-    Ace
 }

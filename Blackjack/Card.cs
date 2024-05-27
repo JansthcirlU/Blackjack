@@ -8,9 +8,8 @@ public readonly record struct Card(Rank Rank, Suit Suit, int Deck) : IEquivalent
     public int GetRankValue()
         => Rank switch
         {
-            Rank.Ace => 1,
-            Rank.Ten or Rank.Jack or Rank.Queen or Rank.King => 10,
-            Rank r => (int)r,
+            Rank.Jack or Rank.Queen or Rank.King => 10,
+            Rank r => (int)r + 1
         };
 
     public override string ToString()
